@@ -9,12 +9,9 @@ import (
 )
 
 func config(handler irc.Handler) irc.ClientConfig {
-	db, err := database.Handle()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	db := database.Handle()
 
-	rows, err := db.Query("SELECT username, password FROM bot_account WHERE id = 1")
+	rows, err := db.Query("SELECT username, password FROM bot_credentials WHERE id = 1")
 	if err != nil {
 		log.Fatalln(err)
 	}

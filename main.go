@@ -5,10 +5,17 @@ import (
 	"net/http"
 
 	"github.com/haydenmuhl/hambot/chat"
+	"github.com/haydenmuhl/hambot/database"
 )
 
 func main() {
 	var err error
+
+	err = database.Init()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	mux := http.NewServeMux()
 
 	rootHandler := http.HandlerFunc(func(r http.ResponseWriter, req *http.Request) {
