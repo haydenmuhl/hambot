@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"log"
 )
 
 type migration struct {
@@ -18,9 +19,12 @@ func (m migration) ApplyTo(db *sql.DB) error {
 	var version string
 	err = row.Scan(&version)
 	if err == nil {
+		log.Printf("Skipping migration %s, already applied\n", m.Version)
 		return nil
 	}
 
+	log.Printf("Applying migration %s\n", m.Version)
+	log.Printf("Running SQL statement: %s\n", m.Query)
 	_, err = tx.Exec(m.Query)
 	if err != nil {
 		tx.Rollback()
