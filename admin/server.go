@@ -10,6 +10,8 @@ import (
 func init() {
 	mux.HandleFunc("/", handleRoot)
 	mux.HandleFunc("/on", handleOn)
+	mux.HandleFunc("/bootstrap/setup", initialSetupForm)
+	mux.HandleFunc("/bootstrap/submit", processSetupForm)
 }
 
 func handleRoot(r http.ResponseWriter, req *http.Request) {
@@ -23,6 +25,12 @@ func handleRoot(r http.ResponseWriter, req *http.Request) {
 }
 
 func handleOn(r http.ResponseWriter, req *http.Request) {
+	if !chat.HasCredentials() {
+		r.Header().Set("Location", "/bootstrap/setup")
+		r.WriteHeader(http.StatusFound)
+		return
+	}
+
 	go chat.Client().Run()
 	r.WriteHeader(http.StatusOK)
 	r.Write([]byte("<p>Chat bot started</p>"))

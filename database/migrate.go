@@ -20,6 +20,7 @@ func (m migration) ApplyTo(db *sql.DB) error {
 	err = row.Scan(&version)
 	if err == nil {
 		log.Printf("Skipping migration %s, already applied\n", m.Version)
+		tx.Commit()
 		return nil
 	}
 

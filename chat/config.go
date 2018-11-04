@@ -32,3 +32,22 @@ func config(handler irc.Handler) irc.ClientConfig {
 		Handler: handler,
 	}
 }
+
+func HasCredentials() bool {
+	db := database.Handle()
+
+	rows, err := db.Query("SELECT count(id) FROM bot_credentials")
+	defer rows.Close()
+	if err != nil {
+		return false
+	}
+	if !rows.Next() {
+		return false
+	}
+	var count int
+	err = rows.Scan(&count)
+	if err != nil {
+		return false
+	}
+	return count > 0
+}
