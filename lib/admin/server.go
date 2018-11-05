@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/haydenmuhl/hambot/chat"
+	"github.com/haydenmuhl/hambot/lib/chat"
 )
 
 func init() {

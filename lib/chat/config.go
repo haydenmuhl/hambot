@@ -3,7 +3,7 @@ package chat
 import (
 	"log"
 
-	"github.com/haydenmuhl/hambot/database"
+	"github.com/haydenmuhl/hambot/lib/database"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/irc.v2"
 )

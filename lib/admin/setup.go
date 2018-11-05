@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/haydenmuhl/hambot/database"
+	"github.com/haydenmuhl/hambot/lib/database"
 )
 
 const initialSetupFormTmpl = `
