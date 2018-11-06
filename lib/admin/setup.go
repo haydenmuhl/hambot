@@ -24,6 +24,10 @@ const initialSetupFormTmpl = `
   	<input type="text" id="password" name="password">
   </div>
   <div>
+    <label for="channel">Channel:</label>
+    <input type="text" id="channel" name="channel">
+  </div>
+  <div>
   	<button type="submit">Submit</button>
   </div>
 </form>
@@ -39,17 +43,26 @@ func processSetupForm(r http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
 	username := req.Form["username"][0]
 	password := req.Form["password"][0]
+	channel := req.Form["channel"][0]
 
 	// TODO: Add validation
 	log.Printf("Writing credentials to the database for user %s\n", username)
 	db := database.Handle()
-	result, err := db.Exec("INSERT INTO bot_credentials (id, username, password) VALUES (1, ?, ?)", username, password)
+	result, err := db.Exec("INSERT INTO credential (id, username, password) VALUES (1, ?, ?)", username, password)
 	if err != nil {
 		log.Println(err)
 		log.Println(result)
 		r.WriteHeader(http.StatusInternalServerError)
 		r.Write([]byte("Something went wrong. :-("))
 		return
+	}
+
+	result, err = db.Exec("INSERT INTO channel (id, name, credential_id) VALUES (1, ?, ?)", channel, 1)
+	if err != nil {
+		log.Println(err)
+		log.Println(result)
+		r.WriteHeader(http.StatusInternalServerError)
+		r.Write([]byte("Something went wrong :-("))
 	}
 
 	log.Println("Redirecting to turn the bot on")

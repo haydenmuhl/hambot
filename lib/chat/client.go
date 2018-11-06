@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -13,22 +14,28 @@ func Client() *irc.Client {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	var config irc.ClientConfig = config(newHandler())
+	bot := config()
 
-	return irc.NewClient(conn, config)
+	return irc.NewClient(conn, bot.IrcConfig())
 }
 
-func newHandler() irc.Handler {
-	return irc.HandlerFunc(func(client *irc.Client, message *irc.Message) {
-		log.Println(message)
-		if message.Command == "001" {
-			client.Write("JOIN #soonraccoon")
-		} else if message.Command == "PING" {
-			handlePing(client, message)
-		} else if message.Command == "PRIVMSG" && strings.ToLower(message.Params[1]) == "bleep" {
-			client.Write(":roboraccoon!roboraccoon@roboraccoon.tmi.twitch.tv PRIVMSG #soonraccoon :bloop")
-		}
-	})
+type Handler struct {
+	channel string
+}
+
+func (h *Handler) Handle(client *irc.Client, message *irc.Message) {
+	log.Println(message)
+	if message.Command == "001" {
+		client.Write(fmt.Sprintf("JOIN #%s", h.channel))
+	} else if message.Command == "PING" {
+		handlePing(client, message)
+	} else if message.Command == "PRIVMSG" && strings.ToLower(message.Params[1]) == "bleep" {
+		client.Write(fmt.Sprintf(":roboraccoon!roboraccoon@roboraccoon.tmi.twitch.tv PRIVMSG #%s :bloop", h.channel))
+	}
+}
+
+func newHandler(channel string) irc.Handler {
+	return &Handler{channel}
 }
 
 func handlePing(c *irc.Client, m *irc.Message) {

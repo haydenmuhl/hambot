@@ -2,41 +2,48 @@ package chat
 
 import (
 	"log"
+	"strings"
 
 	"github.com/haydenmuhl/hambot/lib/database"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/irc.v2"
 )
 
-func config(handler irc.Handler) irc.ClientConfig {
+type botConfig struct {
+	username, password, channel string
+}
+
+func (b *botConfig) IrcConfig() irc.ClientConfig {
+	return irc.ClientConfig{
+		Nick:    b.username,
+		Pass:    b.password,
+		User:    b.username,
+		Handler: &Handler{strings.ToLower(b.channel)},
+	}
+}
+
+func config() *botConfig {
 	db := database.Handle()
 
-	rows, err := db.Query("SELECT username, password FROM bot_credentials WHERE id = 1")
+	query := `SELECT cr.username, cr.password, ch.name
+			  FROM channel ch
+			  INNER JOIN credential cr on ch.credential_id = cr.id
+			  WHERE ch.id = 1`
+
+	row := db.QueryRow(query)
+
+	bot := botConfig{}
+	err := row.Scan(&bot.username, &bot.password, &bot.channel)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer rows.Close()
-
-	rows.Next()
-	var username string
-	var password string
-	err = rows.Scan(&username, &password)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return irc.ClientConfig{
-		Nick:    username,
-		Pass:    password,
-		User:    username,
-		Handler: handler,
-	}
+	return &bot
 }
 
 func HasCredentials() bool {
 	db := database.Handle()
 
-	rows, err := db.Query("SELECT count(id) FROM bot_credentials")
+	rows, err := db.Query("SELECT count(id) FROM credential")
 	defer rows.Close()
 	if err != nil {
 		return false

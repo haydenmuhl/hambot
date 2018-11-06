@@ -60,10 +60,18 @@ func migrate(db *sql.DB) error {
 var migrations = []migration{
 	{
 		Version: "2018110200",
-		Query: `CREATE TABLE bot_credentials (
+		Query: `CREATE TABLE credential (
 				  id INTEGER PRIMARY KEY AUTOINCREMENT,
 				  username TEXT,
 				  password TEXT
 				);`,
+	},
+	{
+		Version: "2018110500",
+		Query: `CREATE TABLE channel (
+				  id INTEGER PRIMARY KEY AUTOINCREMENT,
+				  name TEXT,
+				  credential_id INTEGER
+				)`,
 	},
 }
