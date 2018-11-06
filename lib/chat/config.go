@@ -2,7 +2,6 @@ package chat
 
 import (
 	"log"
-	"strings"
 
 	"github.com/haydenmuhl/hambot/lib/database"
 	_ "github.com/mattn/go-sqlite3"
@@ -18,8 +17,12 @@ func (b *botConfig) IrcConfig() irc.ClientConfig {
 		Nick:    b.username,
 		Pass:    b.password,
 		User:    b.username,
-		Handler: &Handler{strings.ToLower(b.channel)},
+		Handler: b.Handler(),
 	}
+}
+
+func (b *botConfig) Handler() *Handler {
+	return newHandler(b.channel)
 }
 
 func config() *botConfig {

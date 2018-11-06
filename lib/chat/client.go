@@ -34,8 +34,8 @@ func (h *Handler) Handle(client *irc.Client, message *irc.Message) {
 	}
 }
 
-func newHandler(channel string) irc.Handler {
-	return &Handler{channel}
+func newHandler(channel string) *Handler {
+	return &Handler{strings.ToLower(channel)}
 }
 
 func handlePing(c *irc.Client, m *irc.Message) {
